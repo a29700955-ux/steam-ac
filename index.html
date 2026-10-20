@@ -81,14 +81,14 @@
 <header>
     <div class="logo">ELITEGAMES</div>
     <div class="header-controls">
-        <button class="add-btn" id="addAccountBtn" onclick="window.toggleGlobalApp('openAddModal')">+ Add Account</button>
-        <div class="menu-btn" onclick="window.toggleGlobalDropdown()">☰</div>
+        <button class="add-btn" id="addAccountBtn" onclick="toggleGlobalApp('openAddModal')">+ Add Account</button>
+        <div class="menu-btn" onclick="toggleGlobalDropdown()">☰</div>
     </div>
     <div class="dropdown" id="navDropdown">
-        <a href="#" onclick="window.toggleGlobalDropdown()">Home</a>
-        <a href="#" onclick="window.toggleGlobalDropdown()">Platforms</a>
-        <a href="#" onclick="window.toggleGlobalDropdown()">About</a>
-        <a onclick="window.toggleGlobalApp('openLoginModal')" style="color: #00ffff;" id="loginNavText">Admin Login</a>
+        <a href="#" onclick="toggleGlobalDropdown()">Home</a>
+        <a href="#" onclick="toggleGlobalDropdown()">Platforms</a>
+        <a href="#" onclick="toggleGlobalDropdown()">About</a>
+        <a onclick="toggleGlobalApp('openLoginModal')" style="color: #00ffff;" id="loginNavText">Admin Login</a>
     </div>
 </header>
 
@@ -97,8 +97,8 @@
     <a href="https://tiktok.com/@abdullah.steam" class="vip-btn" target="_blank">👑 VIP</a>
     
     <div class="filters">
-        <button class="filter-btn active" onclick="window.filterCategory('all', this)">All</button>
-        <button class="filter-btn" onclick="window.filterCategory('steam', this)">Steam</button>
+        <button class="filter-btn active" onclick="filterCategory('all', this)">All</button>
+        <button class="filter-btn" onclick="filterCategory('steam', this)">Steam</button>
         <button class="filter-btn" onclick="filterCategory('epic', this)">Epic Games</button>
         <button class="filter-btn" onclick="filterCategory('capcut', this)">CapCut</button>
     </div>
@@ -110,7 +110,7 @@
         <div class="reviews-content">
             <div class="reviews-display-container" id="reviewsGrid"></div>
             <div class="review-form-container">
-                <form class="review-form" id="reviewForm" onsubmit="window.submitGlobalReview(event)">
+                <form class="review-form" id="reviewForm" onsubmit="submitGlobalReview(event)">
                     <input type="text" id="reviewerName" placeholder="اسمك" required>
                     <select id="reviewedPlatform" required>
                         <option value="" disabled selected>اختر الحساب الذي اشتريته</option>
@@ -143,7 +143,7 @@
             <div class="input-group">
                 <input type="password" id="pinInput" placeholder="Enter 8-digit PIN" maxlength="8" style="text-align: center;">
             </div>
-            <button class="action-btn" onclick="window.verifyGlobalPin()">unlock Credentials</button>
+            <button class="action-btn" onclick="verifyGlobalPin()">unlock Credentials</button>
         </div>
         <div id="credentialsSection" style="display:none;">
             <div class="input-group">
@@ -154,9 +154,9 @@
                 <label>PASSWORD</label>
                 <input type="text" id="modalPass" readonly style="text-align: center;">
             </div>
-            <button class="action-btn" style="background:#00ffff;" onclick="window.copyGlobalCredentials()">📋 Copy All Credentials</button>
+            <button class="action-btn" style="background:#00ffff;" onclick="copyGlobalCredentials()">📋 Copy All Credentials</button>
         </div>
-        <button onclick="window.closeModal('accountModal')" style="background:transparent; border:none; color:#ff5555; margin-top:15px; cursor:pointer; font-size: 14px;">Back</button>
+        <button onclick="closeModal('accountModal')" style="background:transparent; border:none; color:#ff5555; margin-top:15px; cursor:pointer; font-size: 14px;">Back</button>
     </div>
 </div>
 
@@ -171,8 +171,8 @@
             <label>PASSWORD</label>
             <input type="password" id="loginPass" placeholder="Enter password" style="text-align: center;">
         </div>
-        <button class="action-btn" onclick="window.verifyGlobalLogin()">Login</button>
-        <button onclick="window.closeModal('loginModal')" style="background:transparent; border:none; color:#ff5555; margin-top:15px; cursor:pointer; font-size: 14px;">Cancel</button>
+        <button class="action-btn" onclick="verifyGlobalLogin()">Login</button>
+        <button onclick="closeModal('loginModal')" style="background:transparent; border:none; color:#ff5555; margin-top:15px; cursor:pointer; font-size: 14px;">Cancel</button>
     </div>
 </div>
 
@@ -193,8 +193,8 @@
             <label style="color: #fff; margin-bottom: 5px;">Select Game Image</label>
             <input type="file" id="newImgFile" accept="image/*">
         </div>
-        <button class="action-btn" style="background:#00ff80;" onclick="window.saveGlobalNewAccount()">Save Account</button>
-        <button onclick="window.closeModal('addModal')" style="background:transparent; border:none; color:#ff5555; margin-top:15px; cursor:pointer; font-size: 14px;">Cancel</button>
+        <button class="action-btn" style="background:#00ff80;" onclick="saveGlobalNewAccount()">Save Account</button>
+        <button onclick="closeModal('addModal')" style="background:transparent; border:none; color:#ff5555; margin-top:15px; cursor:pointer; font-size: 14px;">Cancel</button>
     </div>
 </div>
 
@@ -279,7 +279,7 @@
             card.onclick = () => openModal(acc.title, acc.user, acc.pass);
             
             card.innerHTML = `
-                <button class="delete-btn" style="display: ${isLoggedIn ? 'flex' : 'none'};" onclick="window.deleteGlobalAccount(event, ${index})">🗑️</button>
+                <button class="delete-btn" style="display: ${isLoggedIn ? 'flex' : 'none'};" onclick="deleteGlobalAccount(event, ${index})">🗑️</button>
                 <img src="${acc.img}" alt="${acc.title}" onerror="this.src='https://via.placeholder.com/150'">
                 <h3>${acc.title}</h3>
             `;
@@ -331,7 +331,7 @@
         } else if (action === 'openLoginModal') {
             document.getElementById('loginModal').style.display = 'flex';
         }
-        window.toggleGlobalDropdown();
+        toggleGlobalDropdown();
     }
 
     window.verifyGlobalLogin = function() {
@@ -341,7 +341,7 @@
         if (enteredUser === ADMIN_USER && enteredPass === ADMIN_PASS) {
             isLoggedIn = true;
             alert('تم تسجيل دخول المدير بنجاح!');
-            window.closeModal('loginModal');
+            closeModal('loginModal');
             document.getElementById('loginUser').value = '';
             document.getElementById('loginPass').value = '';
             document.getElementById('addAccountBtn').style.display = 'block';
@@ -370,7 +370,7 @@
             accounts.push({ title, category, user, pass, img: imgData });
             saveAccountsToStorage();
             renderAccounts();
-            window.closeModal('addModal');
+            closeModal('addModal');
             
             document.getElementById('newTitle').value = '';
             document.getElementById('newUser').value = '';
@@ -393,6 +393,8 @@
         
         const rating = ratingElement.value;
         const message = document.getElementById('reviewMessage').value.trim();
+
+        console.log('سيتم إرسال التقييم:', { name, platform, rating, message });
 
         const newReview = { name, platform, rating, message, date: new Date().toLocaleDateString() };
         reviews.unshift(newReview);
