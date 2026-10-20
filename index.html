@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Elite Games</title>
@@ -219,300 +218,273 @@
     </div>
 </div>
 
-<script>
-    const ADMIN_USER = "+97433293328";
-    const ADMIN_PASS = "Aassddffg12345@";
-    const CORRECT_PIN = "33293328";
-    
-    let isLoggedIn = false;
-    let currentCredentials = { user: '', pass: '' };
-    let accounts = [
-        { title: 'The Crew 2', category: 'steam', user: 'hananazzamifdhal', pass: 'Hananazzamifdhal1987hanan', img: 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/646980/header.jpg' },
-        { title: 'Account CapCut', category: 'capcut', user: 'ricardogomis9@gmail.com', pass: 'Aporlas1000rr!', img: 'https://img.utdstc.com/icon/e10/055/e10055c5866225a6c117d727b1318d18445173f4e177b94bfee01a4e58849b3d:l' }
-    ];
-    let reviews = [];
-
-    window.onload = () => {
-        loadAccounts();
-        loadReviews();
-        renderAccounts();
-        renderReviews();
-    };
-
-    function loadAccounts() {
-        const saved = localStorage.getItem('eliteGames_accounts');
-        if (saved) {
-            accounts = JSON.parse(saved);
-        }
-    }
-
-    function saveAccountsToStorage() {
-        localStorage.setItem('eliteGames_accounts', JSON.stringify(accounts));
-    }
-
-    function loadReviews() {
-        const saved = localStorage.getItem('eliteGames_reviews');
-        if (saved) {
-            reviews = JSON.parse(saved);
-        }
-    }
-
-    function saveReviewsToStorage() {
-        localStorage.setItem('eliteGames_reviews', JSON.stringify(reviews));
-    }
-
-    function toggleDropdown() {
-        const dropdown = document.getElementById('navDropdown');
-        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-    }
-
-    const searchInput = document.getElementById('search');
-    searchInput.addEventListener('input', () => {
-        const filter = searchInput.value.toLowerCase();
-        document.querySelectorAll('.card').forEach(card => {
-            const title = card.querySelector('h3').innerText.toLowerCase();
-            card.style.display = title.includes(filter) ? '' : 'none';
-        });
-    });
-
-    function filterCategory(category, element) {
-        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-        element.classList.add('active');
-        document.querySelectorAll('.card').forEach(card => {
-            if (category === 'all' || card.dataset.category === category) {
-                card.style.display = '';
-            } else {
-                card.style.display = 'none';
-            }
-        });
-    }
-
-    function renderAccounts() {
-        const grid = document.getElementById('game-grid');
-        grid.innerHTML = '';
-        accounts.forEach((acc, index) => {
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.dataset.category = acc.category;
-            card.onclick = () => openModal(acc.title, acc.user, acc.pass);
-            
-            card.innerHTML = `
-                <button class="delete-btn" style="display: ${isLoggedIn ? 'flex' : 'none'};" onclick="deleteAccount(event, ${index})">🗑️</button>
-                <img src="${acc.img}" alt="${acc.title}" onerror="this.src='https://via.placeholder.com/150'">
-                <h3>${acc.title}</h3>
-            `;
-            grid.appendChild(card);
-        });
-    }
-
-    function deleteAccount(event, index) {
-        event.stopPropagation(); // Prevents opening the modal
-        if (confirm('Are you sure you want to delete this account?')) {
-            accounts.splice(index, 1);
-            saveAccountsToStorage();
-            renderAccounts();
-        }
-    }
-
-    function submitReview(event) {
-        event.preventDefault();
-        const name = document.getElementById('reviewerName').value.trim();
-        const platform = document.getElementById('reviewedPlatform').value;
-        const rating = document.querySelector('input[name="rating"]:checked').value;
-        const message = document.getElementById('reviewMessage').value.trim();
-
-        const newReview = { name, platform, rating, message, date: new Date().toLocaleDateString() };
-        reviews.unshift(newReview); // Add to beginning of array
-        saveReviewsToStorage();
-        renderReviews();
-
-        // Reset form
-        document.getElementById('reviewerName').value = '';
-        document.getElementById('reviewedPlatform').value = '';
-        document.getElementById('reviewMessage').value = '';
-        document.querySelectorAll('input[name="rating"]').forEach(el => el.checked = false);
-        alert('شكراً لتقييمك!');
-    }
-
-    function renderReviews() {
-        const grid = document.getElementById('reviewsGrid');
-        grid.innerHTML = '';
-        reviews.forEach(rev => {
-            const card = document.createElement('div');
-            card.className = 'review-card';
-            const stars = '★'.repeat(rev.rating) + '☆'.repeat(5 - rev.rating);
-            card.innerHTML = `
-                <h4>${rev.name}</h4>
-                <div class="platform">${rev.platform}</div>
-                <div class="stars">${stars}</div>
-                <p>${rev.message}</p>
-            `;
-            grid.appendChild(card);
-        });
-    }
-
-    function openModal(title, user, pass) {
-        document.getElementById('modalTitle').innerText = title;
-        currentCredentials.user = user;
-        currentCredentials.pass = pass;
-        
-        document.getElementById('pinInput').value = '';
-        document.getElementById('pinSection').style.display = 'block';
-        document.getElementById('credentialsSection').style.display = 'none';
-        document.getElementById('accountModal').style.display = 'flex';
-    }
-
-    function closeModal(modalId) {
-        document.getElementById(modalId).style.display = 'none';
-    }
-
-    function verifyPin() {
-        const enteredPin = document.getElementById('pinInput').value.trim();
-        if (enteredPin === CORRECT_PIN) {
-            document.getElementById('modalUser').value = currentCredentials.user;
-            document.getElementById('modalPass').value = currentCredentials.pass;
-            document.getElementById('pinSection').style.display = 'none';
-            document.getElementById('credentialsSection').style.display = 'block';
-        } else {
-            alert('Incorrect PIN!');
-        }
-    }
-
-    function copyCredentials() {
-        const text = `Username: ${currentCredentials.user}\nPassword: ${currentCredentials.pass}`;
-        navigator.clipboard.writeText(text).then(() => {
-            alert('Credentials copied!');
-        });
-    }
-
-    function openLoginModal() {
-        document.getElementById('loginModal').style.display = 'flex';
-        toggleDropdown();
-    }
-
-    function verifyLogin() {
-        const enteredUser = document.getElementById('loginUser').value.trim();
-        const enteredPass = document.getElementById('loginPass').value.trim();
-
-        if (enteredUser === ADMIN_USER && enteredPass === ADMIN_PASS) {
-            isLoggedIn = true;
-            alert('Logged in as Admin!');
-            closeModal('loginModal');
-            document.getElementById('loginUser').value = '';
-            document.getElementById('loginPass').value = '';
-            document.getElementById('addAccountBtn').style.display = 'block';
-            document.getElementById('loginNavText').innerText = 'Admin Logged In';
-            renderAccounts(); // Re-render to show delete buttons
-        } else {
-            alert('Invalid Admin Credentials!');
-        }
-    }
-
-    function openAddModal() {
-        document.getElementById('addModal').style.display = 'flex';
-    }
-
-    function saveNewAccount() {
-        const title = document.getElementById('newTitle').value.trim();
-        const category = document.getElementById('newCategory').value;
-        const user = document.getElementById('newUser').value.trim();
-        const pass = document.getElementById('newPass').value.trim();
-        const imgFile = document.getElementById('newImgFile').files[0];
-
-        if (!title || !user || !pass || !imgFile) {
-            alert('Please fill all fields and select an image!');
-            return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const imgData = e.target.result;
-            accounts.push({ title, category, user, pass, img: imgData });
-            saveAccountsToStorage();
-            renderAccounts();
-            closeModal('addModal');
-            
-            // Reset form
-            document.getElementById('newTitle').value = '';
-            document.getElementById('newUser').value = '';
-            document.getElementById('newPass').value = '';
-            document.getElementById('newImgFile').value = '';
-        };
-        reader.readAsDataURL(imgFile);
-    }
-
-    window.onclick = function(event) {
-        if (!event.target.matches('.menu-btn') && !event.target.closest('#navDropdown')) {
-            const dropdown = document.getElementById('navDropdown');
-            if (dropdown.style.display === 'block') {
-                dropdown.style.display = 'none';
-            }
-        }
-    }
-    // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyDxe2HvBMaGLrxwcLAZhAMnQs48WsUFEY0",
-  authDomain: "steam2-6804d.firebaseapp.com",
-  projectId: "steam2-6804d",
-  storageBucket: "steam2-6804d.firebasestorage.app",
-  messagingSenderId: "293672297879",
-  appId: "1:293672297879:web:c8823da857fe2eac3750d2",
-  measurementId: "G-BHRHHRGV7K"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-</script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  // استبدل هذه البيانات ببيانات مشروعك الفعلية من Firebase
+  const ADMIN_USER = "+97433293328";
+  const ADMIN_PASS = "Aassddffg12345@";
+  const CORRECT_PIN = "33293328";
+  
+  let isLoggedIn = false;
+  let currentCredentials = { user: '', pass: '' };
+  let accounts = [
+      { title: 'The Crew 2', category: 'steam', user: 'hananazzamifdhal', pass: 'Hananazzamifdhal1987hanan', img: 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/646980/header.jpg' },
+      { title: 'Account CapCut', category: 'capcut', user: 'ricardogomis9@gmail.com', pass: 'Aporlas1000rr!', img: 'https://img.utdstc.com/icon/e10/055/e10055c5866225a6c117d727b1318d18445173f4e177b94bfee01a4e58849b3d:l' }
+  ];
+  let reviews = [];
+
   const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+      apiKey: "AIzaSyDxe2HvBMaGLrxwcLAZhAMnQs48WsUFEY0",
+      authDomain: "steam2-6804d.firebaseapp.com",
+      projectId: "steam2-6804d",
+      storageBucket: "steam2-6804d.firebasestorage.app",
+      messagingSenderId: "293672297879",
+      appId: "1:293672297879:web:c8823da857fe2eac3750d2",
+      measurementId: "G-BHRHHRGV7K"
   };
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  // دالة لإرسال البيانات إلى مجموعة "reviews"
-  window.sendReview = async function(commentText) {
-    try {
-      await addDoc(collection(db, "reviews"), {
-        comment: commentText,
-        timestamp: new Date()
-      });
-      console.log("تمت الإضافة بنجاح");
-    } catch (e) {
-      console.error("خطأ في إضافة المستند: ", e);
-    }
+  window.onload = () => {
+      loadAccounts();
+      loadReviews();
+      renderAccounts();
+      renderReviews();
   };
 
-  // دالة للاستماع المباشر للتحديثات وعرضها في عنصر بالصفحة
-  onSnapshot(collection(db, "reviews"), (snapshot) => {
-    const reviewsList = document.getElementById("reviews-container");
-    if (reviewsList) {
-      reviewsList.innerHTML = "";
-      snapshot.forEach((doc) => {
-        const p = document.createElement("p");
-        p.textContent = doc.data().comment;
-        reviewsList.appendChild(p);
+  function loadAccounts() {
+      const saved = localStorage.getItem('eliteGames_accounts');
+      if (saved) { accounts = JSON.parse(saved); }
+  }
+
+  function saveAccountsToStorage() {
+      localStorage.setItem('eliteGames_accounts', JSON.stringify(accounts));
+  }
+
+  function loadReviews() {
+      const saved = localStorage.getItem('eliteGames_reviews');
+      if (saved) { reviews = JSON.parse(saved); }
+  }
+
+  function saveReviewsToStorage() {
+      localStorage.setItem('eliteGames_reviews', JSON.stringify(reviews));
+  }
+
+  window.toggleDropdown = function() {
+      const dropdown = document.getElementById('navDropdown');
+      dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+  }
+
+  const searchInput = document.getElementById('search');
+  if (searchInput) {
+      searchInput.addEventListener('input', () => {
+          const filter = searchInput.value.toLowerCase();
+          document.querySelectorAll('.card').forEach(card => {
+              const title = card.querySelector('h3').innerText.toLowerCase();
+              card.style.display = title.includes(filter) ? '' : 'none';
+          });
       });
-    }
-  });
+  }
+
+  window.filterCategory = function(category, element) {
+      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+      element.classList.add('active');
+      document.querySelectorAll('.card').forEach(card => {
+          if (category === 'all' || card.dataset.category === category) {
+              card.style.display = '';
+          } else {
+              card.style.display = 'none';
+          }
+      });
+  }
+
+  function renderAccounts() {
+      const grid = document.getElementById('game-grid');
+      if (!grid) return;
+      grid.innerHTML = '';
+      accounts.forEach((acc, index) => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.dataset.category = acc.category;
+          card.onclick = () => openModal(acc.title, acc.user, acc.pass);
+          
+          card.innerHTML = `
+              <button class="delete-btn" style="display: ${isLoggedIn ? 'flex' : 'none'};" onclick="deleteAccount(event, ${index})">🗑️</button>
+              <img src="${acc.img}" alt="${acc.title}" onerror="this.src='https://via.placeholder.com/150'">
+              <h3>${acc.title}</h3>
+          `;
+          grid.appendChild(card);
+      });
+  }
+
+  window.deleteAccount = function(event, index) {
+      event.stopPropagation();
+      if (confirm('Are you sure you want to delete this account?')) {
+          accounts.splice(index, 1);
+          saveAccountsToStorage();
+          renderAccounts();
+      }
+  }
+
+  window.submitReview = async function(event) {
+      event.preventDefault();
+      const name = document.getElementById('reviewerName').value.trim();
+      const platform = document.getElementById('reviewedPlatform').value;
+      const ratingElement = document.querySelector('input[name="rating"]:checked');
+      
+      if (!ratingElement) {
+          alert('الرجاء اختيار التقييم بالنجوم');
+          return;
+      }
+      
+      const rating = ratingElement.value;
+      const message = document.getElementById('reviewMessage').value.trim();
+
+      try {
+          await addDoc(collection(db, "reviews"), {
+              name, platform, rating, message, date: new Date().toLocaleDateString()
+          });
+      } catch (e) {
+          console.error("Error adding document: ", e);
+      }
+
+      const newReview = { name, platform, rating, message, date: new Date().toLocaleDateString() };
+      reviews.unshift(newReview);
+      saveReviewsToStorage();
+      renderReviews();
+
+      document.getElementById('reviewerName').value = '';
+      document.getElementById('reviewedPlatform').value = '';
+      document.getElementById('reviewMessage').value = '';
+      document.querySelectorAll('input[name="rating"]').forEach(el => el.checked = false);
+      alert('تم إرسال التقييم وحفظه بنجاح!');
+  }
+
+  function renderReviews() {
+      const grid = document.getElementById('reviewsGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+      reviews.forEach(rev => {
+          const card = document.createElement('div');
+          card.className = 'review-card';
+          const stars = '★'.repeat(rev.rating) + '☆'.repeat(5 - rev.rating);
+          card.innerHTML = `
+              <h4>${rev.name}</h4>
+              <div class="platform">${rev.platform}</div>
+              <div class="stars">${stars}</div>
+              <p>${rev.message}</p>
+          `;
+          grid.appendChild(card);
+      });
+      
+      onSnapshot(collection(db, "reviews"), (snapshot) => {
+          reviews = [];
+          snapshot.forEach((doc) => {
+              reviews.unshift(doc.data());
+          });
+          renderReviews();
+      });
+  }
+
+  window.openModal = function(title, user, pass) {
+      document.getElementById('modalTitle').innerText = title;
+      currentCredentials.user = user;
+      currentCredentials.pass = pass;
+      
+      document.getElementById('pinInput').value = '';
+      document.getElementById('pinSection').style.display = 'block';
+      document.getElementById('credentialsSection').style.display = 'none';
+      document.getElementById('accountModal').style.display = 'flex';
+  }
+
+  window.closeModal = function(modalId) {
+      document.getElementById(modalId).style.display = 'none';
+  }
+
+  window.verifyPin = function() {
+      const enteredPin = document.getElementById('pinInput').value.trim();
+      if (enteredPin === CORRECT_PIN) {
+          document.getElementById('modalUser').value = currentCredentials.user;
+          document.getElementById('modalPass').value = currentCredentials.pass;
+          document.getElementById('pinSection').style.display = 'none';
+          document.getElementById('credentialsSection').style.display = 'block';
+      } else {
+          alert('Incorrect PIN!');
+      }
+  }
+
+  window.copyCredentials = function() {
+      const text = `Username: ${currentCredentials.user}\nPassword: ${currentCredentials.pass}`;
+      navigator.clipboard.writeText(text).then(() => {
+          alert('Credentials copied!');
+      });
+  }
+
+  window.openLoginModal = function() {
+      document.getElementById('loginModal').style.display = 'flex';
+      toggleDropdown();
+  }
+
+  window.verifyLogin = function() {
+      const enteredUser = document.getElementById('loginUser').value.trim();
+      const enteredPass = document.getElementById('loginPass').value.trim();
+
+      if (enteredUser === ADMIN_USER && enteredPass === ADMIN_PASS) {
+          isLoggedIn = true;
+          alert('Logged in as Admin!');
+          closeModal('loginModal');
+          document.getElementById('loginUser').value = '';
+          document.getElementById('loginPass').value = '';
+          document.getElementById('addAccountBtn').style.display = 'block';
+          document.getElementById('loginNavText').innerText = 'Admin Logged In';
+          renderAccounts();
+      } else {
+          alert('Invalid Admin Credentials!');
+      }
+  }
+
+  window.openAddModal = function() {
+      document.getElementById('addModal').style.display = 'flex';
+  }
+
+  window.saveNewAccount = function() {
+      const title = document.getElementById('newTitle').value.trim();
+      const category = document.getElementById('newCategory').value;
+      const user = document.getElementById('newUser').value.trim();
+      const pass = document.getElementById('newPass').value.trim();
+      const imgFile = document.getElementById('newImgFile').files[0];
+
+      if (!title || !user || !pass || !imgFile) {
+          alert('Please fill all fields and select an image!');
+          return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+          const imgData = e.target.result;
+          accounts.push({ title, category, user, pass, img: imgData });
+          saveAccountsToStorage();
+          renderAccounts();
+          closeModal('addModal');
+          
+          document.getElementById('newTitle').value = '';
+          document.getElementById('newUser').value = '';
+          document.getElementById('newPass').value = '';
+          document.getElementById('newImgFile').value = '';
+      };
+      reader.readAsDataURL(imgFile);
+  }
+
+  window.onclick = function(event) {
+      if (!event.target.matches('.menu-btn') && !event.target.closest('#navDropdown')) {
+          const dropdown = document.getElementById('navDropdown');
+          if (dropdown && dropdown.style.display === 'block') {
+              dropdown.style.display = 'none';
+          }
+      }
+  }
 </script>
 
 </body>
