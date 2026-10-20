@@ -492,6 +492,49 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 </script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  // استبدل هذه البيانات ببيانات مشروعك الفعلية من Firebase
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // دالة لإرسال البيانات إلى مجموعة "reviews"
+  window.sendReview = async function(commentText) {
+    try {
+      await addDoc(collection(db, "reviews"), {
+        comment: commentText,
+        timestamp: new Date()
+      });
+      console.log("تمت الإضافة بنجاح");
+    } catch (e) {
+      console.error("خطأ في إضافة المستند: ", e);
+    }
+  };
+
+  // دالة للاستماع المباشر للتحديثات وعرضها في عنصر بالصفحة
+  onSnapshot(collection(db, "reviews"), (snapshot) => {
+    const reviewsList = document.getElementById("reviews-container");
+    if (reviewsList) {
+      reviewsList.innerHTML = "";
+      snapshot.forEach((doc) => {
+        const p = document.createElement("p");
+        p.textContent = doc.data().comment;
+        reviewsList.appendChild(p);
+      });
+    }
+  });
+</script>
 
 </body>
 </html>
