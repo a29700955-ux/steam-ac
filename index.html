@@ -26,7 +26,7 @@
         }
         .logo { font-size: 20px; font-weight: bold; color: #00ffff; text-shadow: 0 0 15px #00ffff; }
         .header-controls { display: flex; align-items: center; gap: 10px; }
-        .menu-btn { font-size: 22px; cursor: pointer; color: white; }
+        .menu-btn { font-size: 22px; cursor: pointer; color: white; user-select: none; }
         .container { padding: 15px; max-width: 1200px; margin: auto; }
         .search-bar { width: 100%; padding: 12px; border-radius: 25px; border: 1px solid #3a3a3a; background: rgba(0,0,0,0.5); color: white; margin-bottom: 15px; box-sizing: border-box; text-align: right; }
         .vip-btn { display: block; width: 100%; padding: 12px; background: linear-gradient(90deg, #ff007f, #7928ca); border: none; border-radius: 10px; font-weight: bold; font-size: 16px; margin-bottom: 15px; cursor: pointer; color: white; text-align: center; text-decoration: none; text-shadow: 0 0 5px white; }
@@ -42,7 +42,7 @@
         .card h3 { margin: 8px; font-size: 13px; text-align: center; word-break: break-word; }
         .delete-btn { display: none; position: absolute; top: 10px; left: 10px; background: rgba(255, 0, 0, 0.8); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 16px; cursor: pointer; align-items: center; justify-content: center; z-index: 10; padding: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
         
-        /* Reviews Section - Split Layout */
+        /* Reviews Section */
         .reviews-section { margin-top: 50px; padding: 25px; background: rgba(0,0,0,0.5); border-radius: 15px; border: 1px solid #3a3a3a; }
         .reviews-title { text-align: center; color: #00ffff; margin-bottom: 30px; }
         .reviews-content { display: flex; flex-direction: column-reverse; gap: 30px; }
@@ -81,14 +81,14 @@
 <header>
     <div class="logo">ELITEGAMES</div>
     <div class="header-controls">
-        <button class="add-btn" id="addAccountBtn" onclick="openAddModal()">+ Add Account</button>
-        <div class="menu-btn" onclick="toggleDropdown()">☰</div>
+        <button class="add-btn" id="addAccountBtn" onclick="toggleGlobalApp('openAddModal')">+ Add Account</button>
+        <div class="menu-btn" onclick="toggleGlobalDropdown()">☰</div>
     </div>
     <div class="dropdown" id="navDropdown">
-        <a href="#" onclick="toggleDropdown()">Home</a>
-        <a href="#" onclick="toggleDropdown()">Platforms</a>
-        <a href="#" onclick="toggleDropdown()">About</a>
-        <a onclick="openLoginModal()" style="color: #00ffff;" id="loginNavText">Admin Login</a>
+        <a href="#" onclick="toggleGlobalDropdown()">Home</a>
+        <a href="#" onclick="toggleGlobalDropdown()">Platforms</a>
+        <a href="#" onclick="toggleGlobalDropdown()">About</a>
+        <a onclick="toggleGlobalApp('openLoginModal')" style="color: #00ffff;" id="loginNavText">Admin Login</a>
     </div>
 </header>
 
@@ -103,23 +103,14 @@
         <button class="filter-btn" onclick="filterCategory('capcut', this)">CapCut</button>
     </div>
 
-    <div class="grid" id="game-grid">
-        <!-- Dynamic content -->
-    </div>
+    <div class="grid" id="game-grid"></div>
 
-    <!-- Reviews Section - Split Layout -->
     <div class="reviews-section">
         <h2 class="reviews-title">آراء العملاء</h2>
-        
         <div class="reviews-content">
-            <!-- Left Side: Displayed Reviews -->
-            <div class="reviews-display-container" id="reviewsGrid">
-                <!-- Dynamic reviews -->
-            </div>
-
-            <!-- Right Side: Submission Form -->
+            <div class="reviews-display-container" id="reviewsGrid"></div>
             <div class="review-form-container">
-                <form class="review-form" id="reviewForm" onsubmit="submitReview(event)">
+                <form class="review-form" id="reviewForm" onsubmit="submitGlobalReview(event)">
                     <input type="text" id="reviewerName" placeholder="اسمك" required>
                     <select id="reviewedPlatform" required>
                         <option value="" disabled selected>اختر الحساب الذي اشتريته</option>
@@ -143,19 +134,17 @@
     </div>
 </div>
 
-<!-- Modal for Credentials -->
+<!-- Modals -->
 <div class="modal" id="accountModal">
     <div class="modal-content">
         <h2 id="modalTitle" style="font-size: 18px; margin-bottom: 5px;">Game Title</h2>
         <p id="modalSubtitle" style="color: #888; font-size: 12px; margin-top: 0;">Enter PIN to unlock credentials</p>
-        
         <div id="pinSection">
             <div class="input-group">
                 <input type="password" id="pinInput" placeholder="Enter 8-digit PIN" maxlength="8" style="text-align: center;">
             </div>
-            <button class="action-btn" onclick="verifyPin()">unlock Credentials</button>
+            <button class="action-btn" onclick="verifyGlobalPin()">unlock Credentials</button>
         </div>
-
         <div id="credentialsSection" style="display:none;">
             <div class="input-group">
                 <label>USERNAME</label>
@@ -165,14 +154,12 @@
                 <label>PASSWORD</label>
                 <input type="text" id="modalPass" readonly style="text-align: center;">
             </div>
-            <button class="action-btn" style="background:#00ffff;" onclick="copyCredentials()">📋 Copy All Credentials</button>
+            <button class="action-btn" style="background:#00ffff;" onclick="copyGlobalCredentials()">📋 Copy All Credentials</button>
         </div>
-
         <button onclick="closeModal('accountModal')" style="background:transparent; border:none; color:#ff5555; margin-top:15px; cursor:pointer; font-size: 14px;">Back</button>
     </div>
 </div>
 
-<!-- Modal for Admin Login -->
 <div class="modal" id="loginModal">
     <div class="modal-content">
         <h2 style="font-size: 18px;">Admin Login</h2>
@@ -184,18 +171,15 @@
             <label>PASSWORD</label>
             <input type="password" id="loginPass" placeholder="Enter password" style="text-align: center;">
         </div>
-        <button class="action-btn" onclick="verifyLogin()">Login</button>
+        <button class="action-btn" onclick="verifyGlobalLogin()">Login</button>
         <button onclick="closeModal('loginModal')" style="background:transparent; border:none; color:#ff5555; margin-top:15px; cursor:pointer; font-size: 14px;">Cancel</button>
     </div>
 </div>
 
-<!-- Modal for Adding Account -->
 <div class="modal" id="addModal">
     <div class="modal-content">
         <h2 style="font-size: 18px;">Add New Account</h2>
-        <div class="input-group">
-            <input type="text" id="newTitle" placeholder="Game Title">
-        </div>
+        <div class="input-group"><input type="text" id="newTitle" placeholder="Game Title"></div>
         <div class="input-group">
             <select id="newCategory">
                 <option value="steam">Steam</option>
@@ -203,289 +187,249 @@
                 <option value="capcut">CapCut</option>
             </select>
         </div>
-        <div class="input-group">
-            <input type="text" id="newUser" placeholder="Username">
-        </div>
-        <div class="input-group">
-            <input type="text" id="newPass" placeholder="Password">
-        </div>
+        <div class="input-group"><input type="text" id="newUser" placeholder="Username"></div>
+        <div class="input-group"><input type="text" id="newPass" placeholder="Password"></div>
         <div class="input-group" style="text-align: center;">
             <label style="color: #fff; margin-bottom: 5px;">Select Game Image</label>
             <input type="file" id="newImgFile" accept="image/*">
         </div>
-        <button class="action-btn" style="background:#00ff80;" onclick="saveNewAccount()">Save Account</button>
+        <button class="action-btn" style="background:#00ff80;" onclick="saveGlobalNewAccount()">Save Account</button>
         <button onclick="closeModal('addModal')" style="background:transparent; border:none; color:#ff5555; margin-top:15px; cursor:pointer; font-size: 14px;">Cancel</button>
     </div>
 </div>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+<script>
+    const ADMIN_USER = "+97433293328";
+    const ADMIN_PASS = "Aassddffg12345@";
+    const CORRECT_PIN = "33293328";
+    
+    let isLoggedIn = false;
+    let currentCredentials = { user: '', pass: '' };
+    let accounts = [
+        { title: 'The Crew 2', category: 'steam', user: 'hananazzamifdhal', pass: 'Hananazzamifdhal1987hanan', img: 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/646980/header.jpg' },
+        { title: 'Account CapCut', category: 'capcut', user: 'ricardogomis9@gmail.com', pass: 'Aporlas1000rr!', img: 'https://img.utdstc.com/icon/e10/055/e10055c5866225a6c117d727b1318d18445173f4e177b94bfee01a4e58849b3d:l' }
+    ];
+    let reviews = [];
 
-  const ADMIN_USER = "+97433293328";
-  const ADMIN_PASS = "Aassddffg12345@";
-  const CORRECT_PIN = "33293328";
-  
-  let isLoggedIn = false;
-  let currentCredentials = { user: '', pass: '' };
-  let accounts = [
-      { title: 'The Crew 2', category: 'steam', user: 'hananazzamifdhal', pass: 'Hananazzamifdhal1987hanan', img: 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/646980/header.jpg' },
-      { title: 'Account CapCut', category: 'capcut', user: 'ricardogomis9@gmail.com', pass: 'Aporlas1000rr!', img: 'https://img.utdstc.com/icon/e10/055/e10055c5866225a6c117d727b1318d18445173f4e177b94bfee01a4e58849b3d:l' }
-  ];
-  let reviews = [];
+    window.onload = () => {
+        loadAccounts();
+        loadReviews();
+        renderAccounts();
+        renderReviews();
+    };
 
-  const firebaseConfig = {
-      apiKey: "AIzaSyDxe2HvBMaGLrxwcLAZhAMnQs48WsUFEY0",
-      authDomain: "steam2-6804d.firebaseapp.com",
-      projectId: "steam2-6804d",
-      storageBucket: "steam2-6804d.firebasestorage.app",
-      messagingSenderId: "293672297879",
-      appId: "1:293672297879:web:c8823da857fe2eac3750d2",
-      measurementId: "G-BHRHHRGV7K"
-  };
+    function loadAccounts() {
+        const saved = localStorage.getItem('eliteGames_accounts');
+        if (saved) accounts = JSON.parse(saved);
+    }
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+    function saveAccountsToStorage() {
+        localStorage.setItem('eliteGames_accounts', JSON.stringify(accounts));
+    }
 
-  window.onload = () => {
-      loadAccounts();
-      loadReviews();
-      renderAccounts();
-      renderReviews();
-  };
+    function loadReviews() {
+        const saved = localStorage.getItem('eliteGames_reviews');
+        if (saved) reviews = JSON.parse(saved);
+    }
 
-  function loadAccounts() {
-      const saved = localStorage.getItem('eliteGames_accounts');
-      if (saved) { accounts = JSON.parse(saved); }
-  }
+    function saveReviewsToStorage() {
+        localStorage.setItem('eliteGames_reviews', JSON.stringify(reviews));
+    }
 
-  function saveAccountsToStorage() {
-      localStorage.setItem('eliteGames_accounts', JSON.stringify(accounts));
-  }
+    window.toggleGlobalDropdown = function() {
+        const dropdown = document.getElementById('navDropdown');
+        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+    }
 
-  function loadReviews() {
-      const saved = localStorage.getItem('eliteGames_reviews');
-      if (saved) { reviews = JSON.parse(saved); }
-  }
+    window.closeModal = function(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
 
-  function saveReviewsToStorage() {
-      localStorage.setItem('eliteGames_reviews', JSON.stringify(reviews));
-  }
+    const searchInput = document.getElementById('search');
+    if (searchInput) {
+        searchInput.addEventListener('input', () => {
+            const filter = searchInput.value.toLowerCase();
+            document.querySelectorAll('.card').forEach(card => {
+                const title = card.querySelector('h3').innerText.toLowerCase();
+                card.style.display = title.includes(filter) ? '' : 'none';
+            });
+        });
+    }
 
-  window.toggleDropdown = function() {
-      const dropdown = document.getElementById('navDropdown');
-      dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-  }
+    function filterCategory(category, element) {
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        element.classList.add('active');
+        document.querySelectorAll('.card').forEach(card => {
+            if (category === 'all' || card.dataset.category === category) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
 
-  const searchInput = document.getElementById('search');
-  if (searchInput) {
-      searchInput.addEventListener('input', () => {
-          const filter = searchInput.value.toLowerCase();
-          document.querySelectorAll('.card').forEach(card => {
-              const title = card.querySelector('h3').innerText.toLowerCase();
-              card.style.display = title.includes(filter) ? '' : 'none';
-          });
-      });
-  }
+    function renderAccounts() {
+        const grid = document.getElementById('game-grid');
+        if (!grid) return;
+        grid.innerHTML = '';
+        accounts.forEach((acc, index) => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.dataset.category = acc.category;
+            card.onclick = () => openModal(acc.title, acc.user, acc.pass);
+            
+            card.innerHTML = `
+                <button class="delete-btn" style="display: ${isLoggedIn ? 'flex' : 'none'};" onclick="deleteGlobalAccount(event, ${index})">🗑️</button>
+                <img src="${acc.img}" alt="${acc.title}" onerror="this.src='https://via.placeholder.com/150'">
+                <h3>${acc.title}</h3>
+            `;
+            grid.appendChild(card);
+        });
+    }
 
-  window.filterCategory = function(category, element) {
-      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-      element.classList.add('active');
-      document.querySelectorAll('.card').forEach(card => {
-          if (category === 'all' || card.dataset.category === category) {
-              card.style.display = '';
-          } else {
-              card.style.display = 'none';
-          }
-      });
-  }
+    function openModal(title, user, pass) {
+        document.getElementById('modalTitle').innerText = title;
+        currentCredentials.user = user;
+        currentCredentials.pass = pass;
+        document.getElementById('pinInput').value = '';
+        document.getElementById('pinSection').style.display = 'block';
+        document.getElementById('credentialsSection').style.display = 'none';
+        document.getElementById('accountModal').style.display = 'flex';
+    }
 
-  function renderAccounts() {
-      const grid = document.getElementById('game-grid');
-      if (!grid) return;
-      grid.innerHTML = '';
-      accounts.forEach((acc, index) => {
-          const card = document.createElement('div');
-          card.className = 'card';
-          card.dataset.category = acc.category;
-          card.onclick = () => openModal(acc.title, acc.user, acc.pass);
-          
-          card.innerHTML = `
-              <button class="delete-btn" style="display: ${isLoggedIn ? 'flex' : 'none'};" onclick="deleteAccount(event, ${index})">🗑️</button>
-              <img src="${acc.img}" alt="${acc.title}" onerror="this.src='https://via.placeholder.com/150'">
-              <h3>${acc.title}</h3>
-          `;
-          grid.appendChild(card);
-      });
-  }
+    window.deleteGlobalAccount = function(event, index) {
+        event.stopPropagation();
+        if (confirm('هل أنت متأكد من حذف هذا الحساب؟')) {
+            accounts.splice(index, 1);
+            saveAccountsToStorage();
+            renderAccounts();
+        }
+    }
 
-  window.deleteAccount = function(event, index) {
-      event.stopPropagation();
-      if (confirm('Are you sure you want to delete this account?')) {
-          accounts.splice(index, 1);
-          saveAccountsToStorage();
-          renderAccounts();
-      }
-  }
+    window.verifyGlobalPin = function() {
+        const enteredPin = document.getElementById('pinInput').value.trim();
+        if (enteredPin === CORRECT_PIN) {
+            document.getElementById('modalUser').value = currentCredentials.user;
+            document.getElementById('modalPass').value = currentCredentials.pass;
+            document.getElementById('pinSection').style.display = 'none';
+            document.getElementById('credentialsSection').style.display = 'block';
+        } else {
+            alert('رمز PIN غير صحيح!');
+        }
+    }
 
-  window.submitReview = async function(event) {
-      event.preventDefault();
-      const name = document.getElementById('reviewerName').value.trim();
-      const platform = document.getElementById('reviewedPlatform').value;
-      const ratingElement = document.querySelector('input[name="rating"]:checked');
-      
-      if (!ratingElement) {
-          alert('الرجاء اختيار التقييم بالنجوم');
-          return;
-      }
-      
-      const rating = ratingElement.value;
-      const message = document.getElementById('reviewMessage').value.trim();
+    window.copyGlobalCredentials = function() {
+        const text = `أسم المستخدم: ${currentCredentials.user}\nكلمة المرور: ${currentCredentials.pass}`;
+        navigator.clipboard.writeText(text).then(() => {
+            alert('تم نسخ بيانات الدخول!');
+        });
+    }
 
-      try {
-          await addDoc(collection(db, "reviews"), {
-              name, platform, rating, message, date: new Date().toLocaleDateString()
-          });
-      } catch (e) {
-          console.error("Error adding document: ", e);
-      }
+    window.toggleGlobalApp = function(action) {
+        if (action === 'openAddModal') {
+            document.getElementById('addModal').style.display = 'flex';
+        } else if (action === 'openLoginModal') {
+            document.getElementById('loginModal').style.display = 'flex';
+        }
+        toggleGlobalDropdown();
+    }
 
-      const newReview = { name, platform, rating, message, date: new Date().toLocaleDateString() };
-      reviews.unshift(newReview);
-      saveReviewsToStorage();
-      renderReviews();
+    window.verifyGlobalLogin = function() {
+        const enteredUser = document.getElementById('loginUser').value.trim();
+        const enteredPass = document.getElementById('loginPass').value.trim();
 
-      document.getElementById('reviewerName').value = '';
-      document.getElementById('reviewedPlatform').value = '';
-      document.getElementById('reviewMessage').value = '';
-      document.querySelectorAll('input[name="rating"]').forEach(el => el.checked = false);
-      alert('تم إرسال التقييم وحفظه بنجاح!');
-  }
+        if (enteredUser === ADMIN_USER && enteredPass === ADMIN_PASS) {
+            isLoggedIn = true;
+            alert('تم تسجيل دخول المدير بنجاح!');
+            closeModal('loginModal');
+            document.getElementById('loginUser').value = '';
+            document.getElementById('loginPass').value = '';
+            document.getElementById('addAccountBtn').style.display = 'block';
+            document.getElementById('loginNavText').innerText = 'Admin Logged In';
+            renderAccounts();
+        } else {
+            alert('بيانات المدير غير صحيحة!');
+        }
+    }
 
-  function renderReviews() {
-      const grid = document.getElementById('reviewsGrid');
-      if (!grid) return;
-      grid.innerHTML = '';
-      reviews.forEach(rev => {
-          const card = document.createElement('div');
-          card.className = 'review-card';
-          const stars = '★'.repeat(rev.rating) + '☆'.repeat(5 - rev.rating);
-          card.innerHTML = `
-              <h4>${rev.name}</h4>
-              <div class="platform">${rev.platform}</div>
-              <div class="stars">${stars}</div>
-              <p>${rev.message}</p>
-          `;
-          grid.appendChild(card);
-      });
-      
-      onSnapshot(collection(db, "reviews"), (snapshot) => {
-          reviews = [];
-          snapshot.forEach((doc) => {
-              reviews.unshift(doc.data());
-          });
-          renderReviews();
-      });
-  }
+    window.saveGlobalNewAccount = function() {
+        const title = document.getElementById('newTitle').value.trim();
+        const category = document.getElementById('newCategory').value;
+        const user = document.getElementById('newUser').value.trim();
+        const pass = document.getElementById('newPass').value.trim();
+        const imgFile = document.getElementById('newImgFile').files[0];
 
-  window.openModal = function(title, user, pass) {
-      document.getElementById('modalTitle').innerText = title;
-      currentCredentials.user = user;
-      currentCredentials.pass = pass;
-      
-      document.getElementById('pinInput').value = '';
-      document.getElementById('pinSection').style.display = 'block';
-      document.getElementById('credentialsSection').style.display = 'none';
-      document.getElementById('accountModal').style.display = 'flex';
-  }
+        if (!title || !user || !pass || !imgFile) {
+            alert('الرجاء تعبئة جميع الحقول واختيار صورة!');
+            return;
+        }
 
-  window.closeModal = function(modalId) {
-      document.getElementById(modalId).style.display = 'none';
-  }
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const imgData = e.target.result;
+            accounts.push({ title, category, user, pass, img: imgData });
+            saveAccountsToStorage();
+            renderAccounts();
+            closeModal('addModal');
+            
+            document.getElementById('newTitle').value = '';
+            document.getElementById('newUser').value = '';
+            document.getElementById('newPass').value = '';
+            document.getElementById('newImgFile').value = '';
+        };
+        reader.readAsDataURL(imgFile);
+    }
 
-  window.verifyPin = function() {
-      const enteredPin = document.getElementById('pinInput').value.trim();
-      if (enteredPin === CORRECT_PIN) {
-          document.getElementById('modalUser').value = currentCredentials.user;
-          document.getElementById('modalPass').value = currentCredentials.pass;
-          document.getElementById('pinSection').style.display = 'none';
-          document.getElementById('credentialsSection').style.display = 'block';
-      } else {
-          alert('Incorrect PIN!');
-      }
-  }
+    window.submitGlobalReview = function(event) {
+        event.preventDefault();
+        const name = document.getElementById('reviewerName').value.trim();
+        const platform = document.getElementById('reviewedPlatform').value;
+        const ratingElement = document.querySelector('input[name="rating"]:checked');
+        
+        if (!ratingElement) {
+            alert('الرجاء اختيار التقييم بالنجوم');
+            return;
+        }
+        
+        const rating = ratingElement.value;
+        const message = document.getElementById('reviewMessage').value.trim();
 
-  window.copyCredentials = function() {
-      const text = `Username: ${currentCredentials.user}\nPassword: ${currentCredentials.pass}`;
-      navigator.clipboard.writeText(text).then(() => {
-          alert('Credentials copied!');
-      });
-  }
+        const newReview = { name, platform, rating, message, date: new Date().toLocaleDateString() };
+        reviews.unshift(newReview);
+        saveReviewsToStorage();
+        renderReviews();
 
-  window.openLoginModal = function() {
-      document.getElementById('loginModal').style.display = 'flex';
-      toggleDropdown();
-  }
+        document.getElementById('reviewerName').value = '';
+        document.getElementById('reviewedPlatform').value = '';
+        document.getElementById('reviewMessage').value = '';
+        document.querySelectorAll('input[name="rating"]').forEach(el => el.checked = false);
+        alert('شكراً لتقييمك!');
+    }
 
-  window.verifyLogin = function() {
-      const enteredUser = document.getElementById('loginUser').value.trim();
-      const enteredPass = document.getElementById('loginPass').value.trim();
+    function renderReviews() {
+        const grid = document.getElementById('reviewsGrid');
+        if (!grid) return;
+        grid.innerHTML = '';
+        reviews.forEach(rev => {
+            const card = document.createElement('div');
+            card.className = 'review-card';
+            const stars = '★'.repeat(rev.rating) + '☆'.repeat(5 - rev.rating);
+            card.innerHTML = `
+                <h4>${rev.name}</h4>
+                <div class="platform">${rev.platform}</div>
+                <div class="stars">${stars}</div>
+                <p>${rev.message}</p>
+            `;
+            grid.appendChild(card);
+        });
+    }
 
-      if (enteredUser === ADMIN_USER && enteredPass === ADMIN_PASS) {
-          isLoggedIn = true;
-          alert('Logged in as Admin!');
-          closeModal('loginModal');
-          document.getElementById('loginUser').value = '';
-          document.getElementById('loginPass').value = '';
-          document.getElementById('addAccountBtn').style.display = 'block';
-          document.getElementById('loginNavText').innerText = 'Admin Logged In';
-          renderAccounts();
-      } else {
-          alert('Invalid Admin Credentials!');
-      }
-  }
-
-  window.openAddModal = function() {
-      document.getElementById('addModal').style.display = 'flex';
-  }
-
-  window.saveNewAccount = function() {
-      const title = document.getElementById('newTitle').value.trim();
-      const category = document.getElementById('newCategory').value;
-      const user = document.getElementById('newUser').value.trim();
-      const pass = document.getElementById('newPass').value.trim();
-      const imgFile = document.getElementById('newImgFile').files[0];
-
-      if (!title || !user || !pass || !imgFile) {
-          alert('Please fill all fields and select an image!');
-          return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-          const imgData = e.target.result;
-          accounts.push({ title, category, user, pass, img: imgData });
-          saveAccountsToStorage();
-          renderAccounts();
-          closeModal('addModal');
-          
-          document.getElementById('newTitle').value = '';
-          document.getElementById('newUser').value = '';
-          document.getElementById('newPass').value = '';
-          document.getElementById('newImgFile').value = '';
-      };
-      reader.readAsDataURL(imgFile);
-  }
-
-  window.onclick = function(event) {
-      if (!event.target.matches('.menu-btn') && !event.target.closest('#navDropdown')) {
-          const dropdown = document.getElementById('navDropdown');
-          if (dropdown && dropdown.style.display === 'block') {
-              dropdown.style.display = 'none';
-          }
-      }
-  }
+    window.onclick = function(event) {
+        const dropdown = document.getElementById('navDropdown');
+        if (dropdown && dropdown.style.display === 'block' && !event.target.matches('.menu-btn') && !event.target.closest('#navDropdown')) {
+            dropdown.style.display = 'none';
+        }
+    }
 </script>
-
 </body>
 </html>
