@@ -4,26 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Elite Games</title>
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDxe2HvBMaGLrxwcLAZhAMnQs48WsUFEY0",
+            authDomain: "steam2-6804d.firebaseapp.com",
+            projectId: "steam2-6804d",
+            storageBucket: "steam2-6804d.firebasestorage.app",
+            messagingSenderId: "293672297879",
+            appId: "1:293672297879:web:c8823da857fe2eac3750d2",
+            measurementId: "G-BHRHHRGV7K"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.db = db;
+        window.collection = collection;
+        window.addDoc = addDoc;
+        window.getDocs = getDocs;
+        window.onSnapshot = onSnapshot;
+        window.deleteDoc = deleteDoc;
+        window.doc = doc;
+    </script>
     <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://wallpaperaccess.com/full/1110777.jpg') no-repeat center center fixed;
-            background-size: cover;
-            color: white;
-            min-height: 100vh;
-        }
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(5px);
-            position: sticky;
-            top: 0;
-            z-index: 999;
-        }
+        body { margin: 0; font-family: Arial, sans-serif; background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://wallpaperaccess.com/full/1110777.jpg') no-repeat center center fixed; background-size: cover; color: white; min-height: 100vh; }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); position: sticky; top: 0; z-index: 999; }
         .logo { font-size: 20px; font-weight: bold; color: #00ffff; text-shadow: 0 0 15px #00ffff; }
         .header-controls { display: flex; align-items: center; gap: 10px; }
         .menu-btn { font-size: 22px; cursor: pointer; color: white; user-select: none; }
@@ -42,13 +51,10 @@
         .card h3 { margin: 8px; font-size: 13px; text-align: center; word-break: break-word; }
         .delete-btn { display: none; position: absolute; top: 10px; left: 10px; background: rgba(255, 0, 0, 0.8); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 16px; cursor: pointer; align-items: center; justify-content: center; z-index: 10; padding: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
         
-        /* Reviews Section */
         .reviews-section { margin-top: 50px; padding: 25px; background: rgba(0,0,0,0.5); border-radius: 15px; border: 1px solid #3a3a3a; }
         .reviews-title { text-align: center; color: #00ffff; margin-bottom: 30px; }
         .reviews-content { display: flex; flex-direction: column-reverse; gap: 30px; }
-        @media (min-width: 768px) {
-            .reviews-content { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; flex-direction: row; }
-        }
+        @media (min-width: 768px) { .reviews-content { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; flex-direction: row; } }
         .review-form-container { background: rgba(255,255,255,0.03); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); }
         .review-form { display: flex; flex-direction: column; gap: 15px; }
         .review-form input, .review-form select, .review-form textarea { width: 100%; padding: 12px; background: #222; border: 1px solid #444; color: white; border-radius: 8px; box-sizing: border-box; text-align: right; }
@@ -205,35 +211,54 @@
     
     let isLoggedIn = false;
     let currentCredentials = { user: '', pass: '' };
-    let accounts = [
+
+    const defaultAccounts = [
         { title: 'The Crew 2', category: 'steam', user: 'hananazzamifdhal', pass: 'Hananazzamifdhal1987hanan', img: 'https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/646980/header.jpg' },
         { title: 'Account CapCut', category: 'capcut', user: 'ricardogomis9@gmail.com', pass: 'Aporlas1000rr!', img: 'https://img.utdstc.com/icon/e10/055/e10055c5866225a6c117d727b1318d18445173f4e177b94bfee01a4e58849b3d:l' }
     ];
-    let reviews = [];
 
     window.onload = () => {
-        loadAccounts();
-        loadReviews();
-        renderAccounts();
-        renderReviews();
+        setupFirebaseRealtime();
     };
 
-    function loadAccounts() {
-        const saved = localStorage.getItem('eliteGames_accounts');
-        if (saved) accounts = JSON.parse(saved);
+    function setupFirebaseRealtime() {
+        const interval = setInterval(() => {
+            if (window.db) {
+                clearInterval(interval);
+                initRealtimeSync();
+            }
+        }, 100);
     }
 
-    function saveAccountsToStorage() {
-        localStorage.setItem('eliteGames_accounts', JSON.stringify(accounts));
-    }
+    function initRealtimeSync() {
+        try {
+            // المزامنة الفورية للحسابات
+            window.onSnapshot(window.collection(window.db, "accounts"), (snapshot) => {
+                const accounts = [];
+                snapshot.forEach((doc) => {
+                    accounts.push({ id: doc.id, ...doc.data() });
+                });
+                if (accounts.length === 0) {
+                    defaultAccounts.forEach(acc => {
+                        window.addDoc(window.collection(window.db, "accounts"), acc);
+                    });
+                } else {
+                    renderAccounts(accounts);
+                }
+            });
 
-    function loadReviews() {
-        const saved = localStorage.getItem('eliteGames_reviews');
-        if (saved) reviews = JSON.parse(saved);
-    }
-
-    function saveReviewsToStorage() {
-        localStorage.setItem('eliteGames_reviews', JSON.stringify(reviews));
+            // المزامنة الفورية للتقييمات
+            window.onSnapshot(window.collection(window.db, "reviews"), (snapshot) => {
+                const reviews = [];
+                snapshot.forEach((doc) => {
+                    reviews.push(doc.data());
+                });
+                reviews.sort((a, b) => new Date(b.date) - new Date(a.date));
+                renderReviews(reviews);
+            });
+        } catch (e) {
+            console.error("خطأ في الاتصال بقاعدة البيانات:", e);
+        }
     }
 
     window.toggleGlobalDropdown = function() {
@@ -268,18 +293,18 @@
         });
     }
 
-    function renderAccounts() {
+    function renderAccounts(accounts) {
         const grid = document.getElementById('game-grid');
         if (!grid) return;
         grid.innerHTML = '';
-        accounts.forEach((acc, index) => {
+        accounts.forEach((acc) => {
             const card = document.createElement('div');
             card.className = 'card';
             card.dataset.category = acc.category;
             card.onclick = () => openModal(acc.title, acc.user, acc.pass);
             
             card.innerHTML = `
-                <button class="delete-btn" style="display: ${isLoggedIn ? 'flex' : 'none'};" onclick="deleteGlobalAccount(event, ${index})">🗑️</button>
+                <button class="delete-btn" style="display: ${isLoggedIn ? 'flex' : 'none'};" onclick="deleteGlobalAccount(event, '${acc.id}')">🗑️</button>
                 <img src="${acc.img}" alt="${acc.title}" onerror="this.src='https://via.placeholder.com/150'">
                 <h3>${acc.title}</h3>
             `;
@@ -297,12 +322,14 @@
         document.getElementById('accountModal').style.display = 'flex';
     }
 
-    window.deleteGlobalAccount = function(event, index) {
+    window.deleteGlobalAccount = async function(event, docId) {
         event.stopPropagation();
         if (confirm('هل أنت متأكد من حذف هذا الحساب؟')) {
-            accounts.splice(index, 1);
-            saveAccountsToStorage();
-            renderAccounts();
+            try {
+                await window.deleteDoc(window.doc(window.db, "accounts", docId));
+            } catch (e) {
+                alert('فشل الحذف');
+            }
         }
     }
 
@@ -346,7 +373,12 @@
             document.getElementById('loginPass').value = '';
             document.getElementById('addAccountBtn').style.display = 'block';
             document.getElementById('loginNavText').innerText = 'Admin Logged In';
-            renderAccounts();
+            
+            window.getDocs(window.collection(window.db, "accounts")).then(snapshot => {
+                const accs = [];
+                snapshot.forEach(doc => accs.push({id: doc.id, ...doc.data()}));
+                renderAccounts(accs);
+            });
         } else {
             alert('بيانات المدير غير صحيحة!');
         }
@@ -365,22 +397,25 @@
         }
 
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = async function(e) {
             const imgData = e.target.result;
-            accounts.push({ title, category, user, pass, img: imgData });
-            saveAccountsToStorage();
-            renderAccounts();
-            closeModal('addModal');
-            
-            document.getElementById('newTitle').value = '';
-            document.getElementById('newUser').value = '';
-            document.getElementById('newPass').value = '';
-            document.getElementById('newImgFile').value = '';
+            try {
+                await window.addDoc(window.collection(window.db, "accounts"), {
+                    title, category, user, pass, img: imgData
+                });
+                closeModal('addModal');
+                document.getElementById('newTitle').value = '';
+                document.getElementById('newUser').value = '';
+                document.getElementById('newPass').value = '';
+                document.getElementById('newImgFile').value = '';
+            } catch (error) {
+                alert('فشل حفظ الحساب في قاعدة البيانات');
+            }
         };
         reader.readAsDataURL(imgFile);
     }
 
-    window.submitGlobalReview = function(event) {
+    window.submitGlobalReview = async function(event) {
         event.preventDefault();
         const name = document.getElementById('reviewerName').value.trim();
         const platform = document.getElementById('reviewedPlatform').value;
@@ -394,21 +429,21 @@
         const rating = ratingElement.value;
         const message = document.getElementById('reviewMessage').value.trim();
 
-        console.log('سيتم إرسال التقييم:', { name, platform, rating, message });
-
-        const newReview = { name, platform, rating, message, date: new Date().toLocaleDateString() };
-        reviews.unshift(newReview);
-        saveReviewsToStorage();
-        renderReviews();
-
-        document.getElementById('reviewerName').value = '';
-        document.getElementById('reviewedPlatform').value = '';
-        document.getElementById('reviewMessage').value = '';
-        document.querySelectorAll('input[name="rating"]').forEach(el => el.checked = false);
-        alert('شكراً لتقييمك!');
+        try {
+            await window.addDoc(window.collection(window.db, "reviews"), {
+                name, platform, rating, message, date: new Date().toISOString()
+            });
+            document.getElementById('reviewerName').value = '';
+            document.getElementById('reviewedPlatform').value = '';
+            document.getElementById('reviewMessage').value = '';
+            document.querySelectorAll('input[name="rating"]').forEach(el => el.checked = false);
+            alert('شكراً لتقييمك!');
+        } catch (e) {
+            alert('فشل إرسال التقييم');
+        }
     }
 
-    function renderReviews() {
+    function renderReviews(reviews) {
         const grid = document.getElementById('reviewsGrid');
         if (!grid) return;
         grid.innerHTML = '';
